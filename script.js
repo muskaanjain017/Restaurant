@@ -35,19 +35,46 @@ document.addEventListener("DOMContentLoaded", async () => {
         new Promise(function ordePrep(resolve, reject) {
             let order_status;
             let paid_status;
+            let status={};
             if(result != null){
                 order_status =true;
                 paid_status = false;
+                status ={"order_status":order_status,"paid_status":paid_status}
+                setTimeout(() => resolve(status), 1500);
             }
-            let status ={"order_status":order_status,"paid_status":paid_status}
-
-            setTimeout(() => resolve(status), 1500);
+            else{
+                reject(status);
+            } 
         }).then(function(status){
-            alert("Order Status: " + status.order_status +"\n" +"Paid Status: "+status.paid_status);
+            alert("Order getting prepared\n"+ "Order Status: " + status.order_status +"\n" +"Paid Status: "+status.paid_status);
             return status;
-      }).then(function(status))
-    });
-    } catch (e) {
+      }).then(function(status){
+        new Promise(function payOrder(resolve, reject) {
+            status.paid_status = true;
+            setTimeout(() => resolve(status), 1000);
+      }).then(function(status){
+        alert("Successfully paid \n"+"Order Status: " + status.order_status +"\n" +"Paid Status: "+status.paid_status);
+        return status;
+      }).then(function thankyouFnc(status){
+        if(status.paid_status===true){
+            alert("Thank you for eating with us today!");
+        }
+      }).catch(
+        function errorValue(sttaus) {
+            alert("Order not paid");
+        }
+    );
+    }).catch(
+        function errorValue(status) {
+            alert("Please pay for the order");
+        }
+    );
+    }).catch(
+        function errorValue(status) {
+            alert("Please select to order");
+        }
+    );
+ } catch (e) {
       console.log(e);
     }
   });
